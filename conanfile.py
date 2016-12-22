@@ -14,6 +14,7 @@ class OpenSSLConan(ConanFile):
                "no_zlib": [True, False],
                "zlib_dynamic": [True, False],
                "shared": [True, False],
+               "purify": [True, False],
                "no_asm": [True, False],
                "386": [True, False],
                "no_sse2": [True, False],
@@ -132,9 +133,11 @@ class OpenSSLConan(ConanFile):
             if self.settings.os == "Linux":
                 if self.settings.build_type == "Debug":
                     config_options_string = "-d " + config_options_string
+                
+                purify = " -DPURIFY" if self.settings.purify == "True" else ""
 
                 m32_pref = "setarch i386" if self.settings.arch == "x86" else ""
-                config_line = "%s ./config -fPIC %s %s" % (m32_pref, config_options_string, m32_suff)
+                config_line = "%s ./config -fPIC %s %s %s" % (m32_pref, config_options_string, m32_suff, purify)
                 self.output.warn(config_line)
                 run_in_src(config_line)
                 run_in_src("make depend")
