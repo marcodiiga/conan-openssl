@@ -6,15 +6,14 @@ import os
 class OpenSSLConan(ConanFile):
     name = "OpenSSL"
     version = "1.0.2j"
-    settings = "os", "compiler", "arch", "build_type"
-    url="http://github.com/lasote/conan-openssl"
+    settings = "os", "compiler", "arch", "build_type", "purify"
+    url="http://github.com/marcodiiga/conan-openssl"
     # https://github.com/openssl/openssl/blob/OpenSSL_1_0_2c/INSTALL
     options = {"no_threads": [True, False],
                "no_electric_fence": [True, False],
                "no_zlib": [True, False],
                "zlib_dynamic": [True, False],
                "shared": [True, False],
-               "purify": [True, False],
                "no_asm": [True, False],
                "386": [True, False],
                "no_sse2": [True, False],
