@@ -6,7 +6,7 @@ import os
 class OpenSSLConan(ConanFile):
     name = "OpenSSL"
     version = "1.0.2j"
-    settings = "os", "compiler", "arch", "build_type", "purify"
+    settings = "os", "compiler", "arch", "build_type"
     url="http://github.com/marcodiiga/conan-openssl"
     # https://github.com/openssl/openssl/blob/OpenSSL_1_0_2c/INSTALL
     options = {"no_threads": [True, False],
@@ -15,6 +15,7 @@ class OpenSSLConan(ConanFile):
                "zlib_dynamic": [True, False],
                "shared": [True, False],
                "no_asm": [True, False],
+               "purify": [True, False],
                "386": [True, False],
                "no_sse2": [True, False],
                "no_bf": [True, False],
@@ -116,7 +117,10 @@ class OpenSSLConan(ConanFile):
             activated = getattr(self.options, option_name)
             if activated:
                 self.output.info("Activated option! %s" % option_name)
-                config_options_string += " %s" % option_name.replace("_", "-")
+                if option_name != "purify":
+                    config_options_string += " %s" % option_name.replace("_", "-")
+                else:
+                    config_options_string += " -DPURIFY"
 
         def run_in_src(command, show_output=False):
             command = 'cd openssl-%s && %s' % (self.version, command)
@@ -132,11 +136,9 @@ class OpenSSLConan(ConanFile):
             if self.settings.os == "Linux":
                 if self.settings.build_type == "Debug":
                     config_options_string = "-d " + config_options_string
-                
-                purify = " -DPURIFY" if self.settings.purify == "True" else ""
 
                 m32_pref = "setarch i386" if self.settings.arch == "x86" else ""
-                config_line = "%s ./config -fPIC %s %s %s" % (m32_pref, config_options_string, m32_suff, purify)
+                config_line = "%s ./config -fPIC %s %s" % (m32_pref, config_options_string, m32_suff)
                 self.output.warn(config_line)
                 run_in_src(config_line)
                 run_in_src("make depend")
